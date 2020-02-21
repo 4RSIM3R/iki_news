@@ -22,8 +22,8 @@ class NewsApiResponse {
   factory NewsApiResponse.fromJson(Map<String, dynamic> json) => NewsApiResponse(
         source: Source.fromJson(json["source"]),
         author: json["author"],
-        title: json["title"],
-        description: json["description"],
+        title: json["title"] ?? '',
+        description: json["description"] ?? '',
         url: json["url"],
         urlToImage: json["urlToImage"],
         publishedAt: DateTime.parse(json["publishedAt"]),

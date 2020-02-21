@@ -1,8 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:iki_news/bloc/news_bloc.dart';
+import 'package:iki_news/model/news_api_response.dart';
+import 'package:iki_news/widget/header_news.dart';
 import 'package:shimmer/shimmer.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   const Home({Key key}) : super(key: key);
+
+  @override
+  _HomeState createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  NewsBloc bloc = NewsBloc();
+
+  @override
+  void initState() {
+    super.initState();
+    bloc.getAmericanNews().then((val) {
+      print('Datane ${val[0].author}');
+    }).catchError((e) {
+      print('Error Pak ${e.toString()}');
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,75 +34,51 @@ class Home extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text(
-                    'US Politics',
-                    style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
-                  ),
-                  GestureDetector(
-                    child: Container(
-                      decoration:
-                          BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(5.0)),
-                      padding: EdgeInsets.all(8.0),
-                      child: Center(
-                        child: Text(
-                          'Show All',
-                          style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+              HeaderNews(
+                title: 'Us Politic',
+                prefix: 'Tes',
+                onTap: () {},
+              ),
+              StreamBuilder<List<NewsApiResponse>>(
+                  stream: bloc.americanNewResponse,
+                  builder: (context, AsyncSnapshot<List<NewsApiResponse>> snapshot) {
+                    if (snapshot.hasError) {
+                      return Container(
+                        child: Center(
+                          child: Text(snapshot.error.toString()),
                         ),
-                      ),
-                    ),
-                  )
-                ],
-              ),
-              Container(
-                height: 250.0,
-                margin: EdgeInsets.only(top: 18.0, bottom: 18.0, right: 8.0),
-                child: ListView.builder(
-                  itemCount: 5,
-                  physics: BouncingScrollPhysics(),
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, index) {
-                    return Shimmer.fromColors(
-                      baseColor: Colors.grey[300],
-                      highlightColor: Colors.grey[100],
-                      enabled: true,
-                      child: Container(
+                      );
+                    } else {
+                      return Container(
                         height: 250.0,
-                        width: 250.0,
-                        margin: EdgeInsets.only(right: 12.0),
-                        decoration:
-                            BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(5.0)),
-                      ),
-                    );
-                  },
-                ),
-              ),
+                        margin: EdgeInsets.only(top: 18.0, bottom: 18.0, right: 8.0),
+                        child: ListView.builder(
+                          itemCount: snapshot.data != null ? snapshot.data.length : 0,
+                          physics: BouncingScrollPhysics(),
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) {
+                            return Container(
+                              height: 250.0,
+                              width: 250.0,
+                              margin: EdgeInsets.only(right: 12.0),
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(5.0),
+                                  image:
+                                      DecorationImage(image: NetworkImage(snapshot.data[index].urlToImage))),
+                            );
+                          },
+                        ),
+                      );
+                    }
+                  }),
               SizedBox(
                 height: 18.0,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text(
-                    '+62 News',
-                    style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
-                  ),
-                  GestureDetector(
-                    child: Container(
-                      decoration:
-                          BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(5.0)),
-                      padding: EdgeInsets.all(8.0),
-                      child: Center(
-                        child: Text(
-                          'Show All',
-                          style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                  )
-                ],
+              HeaderNews(
+                title: '+62 News',
+                prefix: 'res',
+                onTap: () {},
               ),
               SizedBox(
                 height: 18.0,
@@ -98,52 +94,14 @@ class Home extends StatelessWidget {
                       enabled: true,
                       child: Padding(
                         padding: const EdgeInsets.only(bottom: 8.0),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Container(
-                              height: 60.0,
-                              width: 60.0,
-                              decoration: BoxDecoration(
-                                  color: Colors.white, borderRadius: BorderRadius.circular(5.0)),
-                            ),
-                            SizedBox(
-                              width: 8.0,
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: <Widget>[
-                                // TODO : Ganti Jadi Teks
-                                Container(
-                                  height: 18.0,
-                                  width: 75.0,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 4.0,
-                                ),
-                                Container(
-                                  height: 14.0,
-                                  width: 55.0,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Spacer(
-                              flex: 1,
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.bookmark_border),
-                              onPressed: () {},
-                              iconSize: 32.0,
-                              color: Colors.white,
-                            )
-                          ],
+                        child: ListTile(
+                          leading: Container(
+                            height: 50.0,
+                            width: 50.0,
+                          ),
+                          title: Text('Tes'),
+                          subtitle: Text('Tes'),
+                          onTap: () {},
                         ),
                       ),
                     );

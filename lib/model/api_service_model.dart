@@ -10,12 +10,15 @@ class ApiServiceModel<T> {
   ApiServiceModel.error(this.data) : status = Status.ERROR;
 
   // TODO : Handling List Response Here
-  factory ApiServiceModel.fromResponseList(Response response, T Function(List) fromJson) {
-    final data = response.data;
+  ApiServiceModel.fromResponseList(Response response, T Function(List) fromJson) {
+    final dataResponse = response.data;
     if (response.statusCode == 200) {
       // TODO : Parse Your Data Here
+      message = dataResponse['status'] as String;
+      data = fromJson(dataResponse['articles'] as List);
     } else {
       // TODO : Throw Bussiness Exception Here To UI
+      throw BussinessException.fromJson(dataResponse);
     }
   }
 
